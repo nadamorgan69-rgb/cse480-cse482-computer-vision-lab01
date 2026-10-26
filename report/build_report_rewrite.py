@@ -10,6 +10,7 @@ from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, S
 
 
 ROOT = Path(__file__).resolve().parents[1]
+REPOSITORY_URL = "https://github.com/nadamorgan69-rgb/cse480-cse482-computer-vision-lab01"
 data = json.loads((ROOT / "results" / "verification.json").read_text())
 assert all(status == "PASS" for status in data["checks"].values())
 m = data["metrics"]
@@ -259,6 +260,11 @@ p(
     "detail while changing colour meaning, and neutral pixels expose why some images respond less than others. "
     "The executed notebook uses these same parameters and produces all five figures shown here; its assertions also "
     f"confirm the four task outputs and reopen all {data['png_count']} saved PNG files."
+)
+p(
+    "<b>Project repository.</b> The notebook, source images, assignment, generated results, report builders, "
+    "requirements, and final documents are available at "
+    f'<link href="{REPOSITORY_URL}"><font color="#1f5f8b">{REPOSITORY_URL}</font></link>.'
 )
 
 

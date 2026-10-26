@@ -19,6 +19,8 @@ replacements = {
 In this notebook I work through four image-processing tasks using the supplied images. I focus on the link between the arithmetic performed on the BGR arrays and what is visible in each result: a colour mask for the apples, weighted addition for the ghostly overlay, a smooth multiplication mask for the vignette, and channel permutations for the surreal-colour experiment. I keep the source files unchanged and save every generated stage under `results/`.
 
 OpenCV loads colour data in **BGR** order, while Matplotlib expects **RGB** for display. I therefore keep the processing arrays in BGR and convert only the copies passed to plotting functions. The final section checks the output relationships numerically so that the explanations and figures refer to the same executed implementation.
+
+**Public project repository:** [https://github.com/nadamorgan69-rgb/cse480-cse482-computer-vision-lab01](https://github.com/nadamorgan69-rgb/cse480-cse482-computer-vision-lab01)
 """,
     2: r"""
 ## Task 1 - Selective Colour Isolation

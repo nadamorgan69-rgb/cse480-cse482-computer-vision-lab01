@@ -5,6 +5,11 @@ The main submission is **Lab01_Computer_Vision.ipynb**, executed with saved outp
 The five-page **report/Lab01_Report.pdf** explains the actual experimental results in a natural first-person engineering voice.
 An editable **report/Lab01_Report.docx** contains the same rewritten discussion and figures.
 
+## Public repository
+
+The complete project is published at:
+[https://github.com/nadamorgan69-rgb/cse480-cse482-computer-vision-lab01](https://github.com/nadamorgan69-rgb/cse480-cse482-computer-vision-lab01)
+
 ## Contents
 
 - `Lab01_Computer_Vision.ipynb`: complete implementations, explanations, figures, and assertions.
@@ -15,6 +20,8 @@ An editable **report/Lab01_Report.docx** contains the same rewritten discussion 
 - `report/Lab01_Report.pdf`: illustrated report with method reasoning, result interpretation, and limitations.
 - `report/Lab01_Report.docx`: editable Word version of the rewritten report.
 - `report/build_report.py`: optional report regeneration from notebook results.
+- `tools/build_lab01_docx.py`: portable Word report generator.
+- `tools/update_notebook_explanations.py`: source used to maintain the notebook narrative.
 - `run_notebook.py`: optional headless execution of the full notebook.
 
 ## Run
@@ -41,6 +48,7 @@ To regenerate the report after executing the notebook:
 
 ```text
 python report/build_report.py
+python tools/build_lab01_docx.py
 ```
 
 ## Tasks and observations

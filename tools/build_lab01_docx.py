@@ -7,10 +7,12 @@ from docx.enum.table import WD_ALIGN_VERTICAL, WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import nsdecls, qn
+from docx.opc.constants import RELATIONSHIP_TYPE as RT
 from docx.shared import Inches, Pt, RGBColor
 
 
 ROOT = Path(__file__).resolve().parents[1]
+REPOSITORY_URL = "https://github.com/nadamorgan69-rgb/cse480-cse482-computer-vision-lab01"
 RESULTS = ROOT / "results"
 OUTPUT = ROOT / "report" / "Lab01_Report.docx"
 DATA = json.loads((RESULTS / "verification.json").read_text(encoding="utf-8"))
@@ -137,6 +139,26 @@ def add_labeled_paragraph(doc, label, text):
     lead.bold = True
     paragraph.add_run(text)
     return paragraph
+
+
+def add_hyperlink(paragraph, text, url):
+    relationship_id = paragraph.part.relate_to(url, RT.HYPERLINK, is_external=True)
+    hyperlink = OxmlElement("w:hyperlink")
+    hyperlink.set(qn("r:id"), relationship_id)
+    run = OxmlElement("w:r")
+    properties = OxmlElement("w:rPr")
+    color = OxmlElement("w:color")
+    color.set(qn("w:val"), "0563C1")
+    underline = OxmlElement("w:u")
+    underline.set(qn("w:val"), "single")
+    properties.append(color)
+    properties.append(underline)
+    run.append(properties)
+    text_node = OxmlElement("w:t")
+    text_node.text = text
+    run.append(text_node)
+    hyperlink.append(run)
+    paragraph._p.append(hyperlink)
 
 
 def add_native_equation(doc, equation_text):
@@ -456,6 +478,10 @@ source = doc.add_paragraph()
 lead = source.add_run("Source ")
 lead.bold = True
 source.add_run("CSE480 CSE482 Lab Assignment 01 supplied with the project")
+repository = doc.add_paragraph()
+lead = repository.add_run("Project repository ")
+lead.bold = True
+add_hyperlink(repository, REPOSITORY_URL, REPOSITORY_URL)
 
 doc.core_properties.title = "Computer Vision Lab Assignment 01"
 doc.core_properties.subject = "CSE480 CSE482 Lab Report"

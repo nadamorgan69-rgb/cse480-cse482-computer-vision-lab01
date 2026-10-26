@@ -2,8 +2,8 @@
 
 Ain Shams University, Mechatronics Engineering and Automation, CSE480/CSE482.
 The main submission is **Lab01_Computer_Vision.ipynb**, executed with saved outputs.
-The five-page **report/Lab01_Report.pdf** explains the actual experimental results in a natural first-person engineering voice.
-An editable **report/Lab01_Report.docx** contains the same rewritten discussion and figures.
+The seven-page **report/Lab01_Report.pdf** explains the actual experimental results in a natural first-person engineering voice.
+An editable **report/Lab01_Report.docx** contains the same rewritten discussion, figures, and designed cover page.
 
 ## Public repository
 
@@ -13,12 +13,12 @@ The complete project is published at:
 ## Contents
 
 - `Lab01_Computer_Vision.ipynb`: complete implementations, explanations, figures, and assertions.
-- `images/`: all six original, unmodified source images; the two cats are validated but not task inputs.
+- `images/`: all six original, unmodified source images plus the original dreamy computer-vision cover artwork; the two cats are validated but not task inputs.
 - `assignment/lab01_tasks.pdf`: the supplied official assignment, copied without changes.
 - `results/task1/` through `results/task4/`: intermediate images, final images, and labeled comparisons (38 PNGs).
 - `results/verification.json`: measured results, task checks, input dimensions and SHA-256 hashes, and versions.
-- `report/Lab01_Report.pdf`: illustrated report with method reasoning, result interpretation, and limitations.
-- `report/Lab01_Report.docx`: editable Word version of the rewritten report.
+- `report/Lab01_Report.pdf`: illustrated report with a designed cover, method reasoning, result interpretation, and limitations.
+- `report/Lab01_Report.docx`: editable Word version with the same cover and a 12/16/18-point typography hierarchy.
 - `report/build_report.py`: optional report regeneration from notebook results.
 - `tools/build_lab01_docx.py`: portable Word report generator.
 - `tools/update_notebook_explanations.py`: source used to maintain the notebook narrative.

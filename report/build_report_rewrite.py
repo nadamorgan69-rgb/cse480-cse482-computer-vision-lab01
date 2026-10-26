@@ -4,40 +4,52 @@ import json
 
 from PIL import Image as PILImage
 from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import CondPageBreak, Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY_URL = "https://github.com/nadamorgan69-rgb/cse480-cse482-computer-vision-lab01"
+COVER_IMAGE = ROOT / "images" / "computer_vision_dream_cover.png"
 data = json.loads((ROOT / "results" / "verification.json").read_text())
 assert all(status == "PASS" for status in data["checks"].values())
 m = data["metrics"]
 
 styles = getSampleStyleSheet()
 styles.add(ParagraphStyle(
-    name="LabTitle", fontName="Helvetica-Bold", fontSize=20, leading=23,
-    textColor=colors.HexColor("#183b56"), spaceAfter=7,
+    name="LabTitle", fontName="Helvetica-Bold", fontSize=18, leading=22,
+    textColor=colors.black, spaceAfter=8, alignment=TA_CENTER,
 ))
 styles.add(ParagraphStyle(
-    name="LabBody", fontName="Helvetica", fontSize=9.3, leading=12.4,
-    textColor=colors.HexColor("#1f2d38"), spaceAfter=7,
+    name="CoverSubheading", fontName="Helvetica-Bold", fontSize=16, leading=20,
+    textColor=colors.black, spaceAfter=7, alignment=TA_CENTER,
 ))
 styles.add(ParagraphStyle(
-    name="LabCaption", fontName="Helvetica-Oblique", fontSize=8, leading=9.8,
-    textColor=colors.HexColor("#465565"), spaceAfter=8,
+    name="CoverBody", fontName="Helvetica", fontSize=12, leading=15,
+    textColor=colors.HexColor("#1f2d38"), spaceAfter=5, alignment=TA_CENTER,
 ))
-styles["Heading1"].textColor = colors.HexColor("#183b56")
-styles["Heading1"].fontSize = 15
-styles["Heading1"].leading = 18
+styles.add(ParagraphStyle(
+    name="LabBody", fontName="Helvetica", fontSize=12, leading=15.5,
+    textColor=colors.HexColor("#1f2d38"), spaceAfter=8, alignment=TA_JUSTIFY,
+))
+styles.add(ParagraphStyle(
+    name="LabCaption", fontName="Helvetica-Oblique", fontSize=12, leading=14.5,
+    textColor=colors.HexColor("#465565"), spaceAfter=9, alignment=TA_CENTER,
+))
+styles["Heading1"].textColor = colors.black
+styles["Heading1"].fontSize = 18
+styles["Heading1"].leading = 22
 styles["Heading1"].spaceBefore = 4
 styles["Heading1"].spaceAfter = 7
-styles["Heading2"].textColor = colors.HexColor("#274f6b")
-styles["Heading2"].fontSize = 10.5
-styles["Heading2"].leading = 13
+styles["Heading1"].alignment = TA_JUSTIFY
+styles["Heading2"].textColor = colors.black
+styles["Heading2"].fontSize = 16
+styles["Heading2"].leading = 20
 styles["Heading2"].spaceBefore = 5
 styles["Heading2"].spaceAfter = 4
+styles["Heading2"].alignment = TA_JUSTIFY
 
 story = []
 
@@ -55,14 +67,14 @@ def figure(relative_path, caption, width=440):
 
 
 def table(rows, widths=None):
-    t = Table(rows, colWidths=widths, hAlign="LEFT")
+    t = Table(rows, colWidths=widths, hAlign="LEFT", repeatRows=1)
     t.setStyle(TableStyle([
         ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#e8eef3")),
         ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
         ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
         ("TEXTCOLOR", (0, 0), (-1, -1), colors.HexColor("#1f2d38")),
-        ("FONTSIZE", (0, 0), (-1, -1), 8.5),
-        ("LEADING", (0, 0), (-1, -1), 10.5),
+        ("FONTSIZE", (0, 0), (-1, -1), 12),
+        ("LEADING", (0, 0), (-1, -1), 14.5),
         ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
         ("TOPPADDING", (0, 0), (-1, -1), 5),
         ("LINEBELOW", (0, 0), (-1, 0), 0.5, colors.HexColor("#aab9c7")),
@@ -73,9 +85,21 @@ def table(rows, widths=None):
     story.append(Spacer(1, 6))
 
 
-# Page 1 - introduction and selective colour
-p("Computer Vision Lab", "LabTitle")
-p("Assignment #01 | CSE480/CSE482<br/>Ain Shams University - Mechatronics Engineering and Automation")
+# Cover page
+story.append(Spacer(1, 18))
+p("Computer Vision Lab Assignment 01", "LabTitle")
+p("CSE480 CSE482 Computer Vision Lab", "CoverSubheading")
+p("Ain Shams University<br/>Mechatronics Engineering and Automation Program", "CoverBody")
+with PILImage.open(COVER_IMAGE) as cover:
+    cover_width, cover_height = cover.size
+story.append(Spacer(1, 10))
+story.append(Image(str(COVER_IMAGE), width=490, height=490 * cover_height / cover_width))
+story.append(Spacer(1, 14))
+p("<b>Student name</b>  Nada Said Yassin Morgan", "CoverBody")
+p("<b>Student ID</b>  23P0284", "CoverBody")
+story.append(PageBreak())
+
+# Introduction and selective colour
 p("How I approached the lab", "Heading2")
 p(
     "I treated the four tasks as small experiments in how pixel values control an image. I kept the supplied "
@@ -114,7 +138,7 @@ p(
 
 
 # Page 2 - weighted overlay
-story.append(PageBreak())
+story.append(CondPageBreak(220))
 p("2. Creating a Ghostly Overlay", "Heading1")
 p(
     "Weighted addition is performed at matching array positions, so both inputs first had to have the same height, "
@@ -154,7 +178,7 @@ p(
 
 
 # Page 3 - vignette
-story.append(PageBreak())
+story.append(CondPageBreak(220))
 p("3. Artistic Vignette Filtering", "Heading1")
 p(
     "I wanted attention to remain on the rover and nearby terrain while the frame edges became darker. I began with "
@@ -195,7 +219,7 @@ p(
 
 
 # Page 4 - channel swapping on the zebra
-story.append(PageBreak())
+story.append(CondPageBreak(220))
 p("4. Channel Swapping - Zebra", "Heading1")
 p(
     "A colour image contains three intensity values at every pixel. OpenCV stores those planes as blue, green, "
@@ -228,7 +252,7 @@ p(
 
 
 # Page 5 - stronger example, limitations, and conclusion
-story.append(PageBreak())
+story.append(CondPageBreak(220))
 p("Channel Swapping on the Mars Image", "Heading1")
 p(
     "I repeated the same three assignments on the Mars rover image as a supplementary comparison. I did not add a "
@@ -251,6 +275,7 @@ p(
     "panels still remain relatively stable. Comparing Figures 4 and 5 shows that a permutation is not inherently "
     "dramatic; its appearance depends on how similar or different the source channels are at each pixel."
 )
+story.append(CondPageBreak(260))
 p("What I learned and what remains limited", "Heading2")
 p(
     "The four results connect directly to their pixel operations. Complementary masks can combine colour and "
@@ -275,16 +300,16 @@ def footer(canvas, doc):
     canvas.setFont("Helvetica", 8)
     canvas.setFillColor(colors.HexColor("#526576"))
     canvas.drawString(48, 28, "CSE480/CSE482 | Computer Vision Lab | Assignment #01")
-    canvas.drawRightString(A4[0] - 48, 28, str(doc.page))
+    canvas.drawRightString(A4[0] - 48, 28, str(doc.page - 1))
     canvas.restoreState()
 
 
 output = ROOT / "report" / "Lab01_Report.pdf"
 doc = SimpleDocTemplate(
     str(output), pagesize=A4, rightMargin=48, leftMargin=48, topMargin=40, bottomMargin=54,
-    title="Computer Vision Lab - Assignment #01",
-    author="Nada - Mechatronics Engineering and Automation",
+    title="Computer Vision Lab Assignment 01",
+    author="Nada Said Yassin Morgan",
     pageCompression=1,
 )
-doc.build(story, onFirstPage=footer, onLaterPages=footer)
+doc.build(story, onFirstPage=lambda canvas, document: None, onLaterPages=footer)
 print(output)

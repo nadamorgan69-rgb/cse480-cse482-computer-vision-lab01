@@ -14,6 +14,7 @@ from docx.shared import Inches, Pt, RGBColor
 ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY_URL = "https://github.com/nadamorgan69-rgb/cse480-cse482-computer-vision-lab01"
 RESULTS = ROOT / "results"
+COVER_IMAGE = ROOT / "images" / "computer_vision_dream_cover.png"
 OUTPUT = ROOT / "report" / "Lab01_Report.docx"
 DATA = json.loads((RESULTS / "verification.json").read_text(encoding="utf-8"))
 METRICS = DATA["metrics"]
@@ -109,7 +110,7 @@ def style_table(table, widths, numeric_columns=()):
                 run.font.name = "Arial"
                 run._element.get_or_add_rPr().rFonts.set(qn("w:ascii"), "Arial")
                 run._element.get_or_add_rPr().rFonts.set(qn("w:hAnsi"), "Arial")
-                run.font.size = Pt(9.5)
+                run.font.size = Pt(12)
                 run.font.color.rgb = RGBColor(255, 255, 255) if row_index == 0 else BLACK
                 run.bold = row_index == 0
 
@@ -134,6 +135,7 @@ def add_figure(doc, relative_path, caption, width=Inches(7.0), alt_text=""):
 
 def add_labeled_paragraph(doc, label, text):
     paragraph = doc.add_paragraph()
+    paragraph.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
     paragraph.paragraph_format.keep_together = True
     lead = paragraph.add_run(label + " ")
     lead.bold = True
@@ -181,6 +183,12 @@ def add_page_break(doc):
     doc.add_page_break()
 
 
+def add_task_heading(doc, text):
+    heading = doc.add_heading(text, level=1)
+    heading.paragraph_format.page_break_before = True
+    return heading
+
+
 def add_page_number(paragraph):
     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
     paragraph.add_run("CSE480 CSE482   Computer Vision Lab   Assignment 01   Page ")
@@ -207,32 +215,46 @@ def remove_paragraph_borders(property_container):
         property_container.remove(borders)
 
 
+def configure_section(section):
+    section.page_width = Inches(8.5)
+    section.page_height = Inches(11)
+    section.top_margin = Inches(0.62)
+    section.bottom_margin = Inches(0.60)
+    section.left_margin = Inches(0.72)
+    section.right_margin = Inches(0.72)
+    section.header_distance = Inches(0.25)
+    section.footer_distance = Inches(0.30)
+
+
+def restart_page_numbering(section, start=1):
+    sect_pr = section._sectPr
+    page_number_type = sect_pr.find(qn("w:pgNumType"))
+    if page_number_type is None:
+        page_number_type = OxmlElement("w:pgNumType")
+        sect_pr.append(page_number_type)
+    page_number_type.set(qn("w:start"), str(start))
+
+
 doc = Document()
 section = doc.sections[0]
-section.page_width = Inches(8.5)
-section.page_height = Inches(11)
-section.top_margin = Inches(0.62)
-section.bottom_margin = Inches(0.60)
-section.left_margin = Inches(0.72)
-section.right_margin = Inches(0.72)
-section.header_distance = Inches(0.25)
-section.footer_distance = Inches(0.30)
+configure_section(section)
 
 styles = doc.styles
 normal = styles["Normal"]
 normal.font.name = "Arial"
 normal._element.rPr.rFonts.set(qn("w:ascii"), "Arial")
 normal._element.rPr.rFonts.set(qn("w:hAnsi"), "Arial")
-normal.font.size = Pt(10.5)
+normal.font.size = Pt(12)
 normal.font.color.rgb = BLACK
 normal.paragraph_format.space_after = Pt(5)
-normal.paragraph_format.line_spacing = 1.08
+normal.paragraph_format.line_spacing = 1.12
+normal.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
 title_style = styles["Title"]
 title_style.font.name = "Arial"
 title_style._element.rPr.rFonts.set(qn("w:ascii"), "Arial")
 title_style._element.rPr.rFonts.set(qn("w:hAnsi"), "Arial")
-title_style.font.size = Pt(22)
+title_style.font.size = Pt(18)
 title_style.font.bold = True
 title_style.font.color.rgb = BLACK
 title_style.paragraph_format.space_after = Pt(6)
@@ -242,7 +264,7 @@ if title_style_ppr is None:
     title_style._element.append(title_style_ppr)
 remove_paragraph_borders(title_style_ppr)
 
-for name, size, before, after in (("Heading 1", 15, 5, 5), ("Heading 2", 11.5, 5, 3)):
+for name, size, before, after in (("Heading 1", 18, 7, 6), ("Heading 2", 16, 6, 4)):
     style = styles[name]
     style.font.name = "Arial"
     style._element.rPr.rFonts.set(qn("w:ascii"), "Arial")
@@ -253,28 +275,64 @@ for name, size, before, after in (("Heading 1", 15, 5, 5), ("Heading 2", 11.5, 5
     style.paragraph_format.space_before = Pt(before)
     style.paragraph_format.space_after = Pt(after)
     style.paragraph_format.keep_with_next = True
+    style.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
 
 caption_style = styles["Caption"]
 caption_style.font.name = "Arial"
 caption_style._element.rPr.rFonts.set(qn("w:ascii"), "Arial")
 caption_style._element.rPr.rFonts.set(qn("w:hAnsi"), "Arial")
-caption_style.font.size = Pt(8.5)
+caption_style.font.size = Pt(12)
 caption_style.font.italic = True
 caption_style.font.color.rgb = RGBColor(80, 80, 80)
 caption_style.paragraph_format.space_after = Pt(5)
 
-add_page_number(section.footer.paragraphs[0])
-
+# Cover page
+cover_spacer = doc.add_paragraph()
+cover_spacer.paragraph_format.space_after = Pt(8)
 title = doc.add_paragraph("Computer Vision Lab Assignment 01", style="Title")
 title.alignment = WD_ALIGN_PARAGRAPH.CENTER
 remove_paragraph_borders(title._p.get_or_add_pPr())
-subtitle = doc.add_paragraph("CSE480 CSE482 Lab")
+subtitle = doc.add_paragraph("CSE480 CSE482 Computer Vision Lab")
 subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
 subtitle.runs[0].bold = True
-subtitle.runs[0].font.size = Pt(12)
+subtitle.runs[0].font.size = Pt(16)
 program = doc.add_paragraph("Ain Shams University  Mechatronics Engineering and Automation Program")
 program.alignment = WD_ALIGN_PARAGRAPH.CENTER
-program.paragraph_format.space_after = Pt(9)
+program.paragraph_format.space_after = Pt(12)
+program.runs[0].font.size = Pt(12)
+
+cover_visual = doc.add_paragraph()
+cover_visual.alignment = WD_ALIGN_PARAGRAPH.CENTER
+cover_visual.paragraph_format.space_after = Pt(12)
+cover_shape = cover_visual.add_run().add_picture(str(COVER_IMAGE), width=Inches(6.85))
+set_alt_text(
+    cover_shape,
+    "Dreamy computer vision cover artwork",
+    "A luminous camera lens and abstract eye surrounded by neural networks, pixel grids, feature points, contours, and depth-map layers in blue and violet light.",
+)
+
+student_name = doc.add_paragraph()
+student_name.alignment = WD_ALIGN_PARAGRAPH.CENTER
+student_name.paragraph_format.space_after = Pt(4)
+name_label = student_name.add_run("Student name  ")
+name_label.bold = True
+student_name.add_run("Nada Said Yassin Morgan")
+for run in student_name.runs:
+    run.font.size = Pt(12)
+
+student_id = doc.add_paragraph()
+student_id.alignment = WD_ALIGN_PARAGRAPH.CENTER
+id_label = student_id.add_run("Student ID  ")
+id_label.bold = True
+student_id.add_run("23P0284")
+for run in student_id.runs:
+    run.font.size = Pt(12)
+
+content_section = doc.add_section(WD_SECTION.NEW_PAGE)
+configure_section(content_section)
+content_section.footer.is_linked_to_previous = False
+add_page_number(content_section.footer.paragraphs[0])
+restart_page_numbering(content_section, 1)
 
 doc.add_heading("How I approached the lab", level=2)
 doc.add_paragraph(
@@ -311,8 +369,7 @@ add_labeled_paragraph(
     "red-dominant pixels, not complete apples. Whole-object detection would need spatial or shape information."
 )
 
-add_page_break(doc)
-doc.add_heading("Task 2 Creating a Ghostly Overlay", level=1)
+add_task_heading(doc, "Task 2 Creating a Ghostly Overlay")
 add_labeled_paragraph(
     doc,
     "Preparing the images",
@@ -339,7 +396,7 @@ add_figure(
     doc,
     "task2/comparison.png",
     "Figure 2  Prepared inputs and three pixel by pixel weighted blends",
-    width=Inches(6.35),
+    width=Inches(5.75),
     alt_text="Cameraman and zebra inputs followed by blends with weights 0.75 and 0.25, 0.50 and 0.50, and 0.25 and 0.75."
 )
 add_labeled_paragraph(
@@ -352,8 +409,7 @@ add_labeled_paragraph(
     "A cleaner composite would require foreground extraction, which is outside this full-image blending task."
 )
 
-add_page_break(doc)
-doc.add_heading("Task 3 Artistic Vignette Filtering", level=1)
+add_task_heading(doc, "Task 3 Artistic Vignette Filtering")
 add_labeled_paragraph(
     doc,
     "Reasoning and method",
@@ -399,8 +455,7 @@ add_labeled_paragraph(
     "corner detail, but the current near-black corners give the requested strong framing."
 )
 
-add_page_break(doc)
-doc.add_heading("Task 4 Channel Swapping", level=1)
+add_task_heading(doc, "Task 4 Channel Swapping")
 add_labeled_paragraph(
     doc,
     "Reasoning and method",
@@ -436,8 +491,7 @@ add_labeled_paragraph(
     "and explains why a large changed-pixel count can still look subtle."
 )
 
-add_page_break(doc)
-doc.add_heading("Channel Swapping on the Mars Image", level=1)
+add_task_heading(doc, "Channel Swapping on the Mars Image")
 doc.add_paragraph(
     "I repeated the same assignments on the Mars image without adding a tint or changing contrast. The orange-brown "
     "terrain has more unequal BGR values, so this supplementary example makes the channel effects easier to see."
@@ -466,7 +520,8 @@ add_labeled_paragraph(
     "those unequal values to different display channels changes most of the frame. Neutral rover panels remain "
     "more stable. The comparison shows that the strength of a permutation depends on the source channel differences."
 )
-doc.add_heading("What I learned and what remains limited", level=2)
+conclusion_heading = doc.add_heading("What I learned and what remains limited", level=2)
+conclusion_heading.paragraph_format.page_break_before = True
 doc.add_paragraph(
     "Complementary masks combine colour and grayscale exactly, but a colour threshold does not understand object "
     "boundaries. Weighted addition makes both images visible while also mixing their backgrounds. Gaussian smoothing "
@@ -485,7 +540,7 @@ add_hyperlink(repository, REPOSITORY_URL, REPOSITORY_URL)
 
 doc.core_properties.title = "Computer Vision Lab Assignment 01"
 doc.core_properties.subject = "CSE480 CSE482 Lab Report"
-doc.core_properties.author = "Mechatronics Engineering and Automation Program"
+doc.core_properties.author = "Nada Said Yassin Morgan"
 doc.core_properties.keywords = "OpenCV, computer vision, selective colour, blending, vignette, channel swapping"
 doc.core_properties.comments = "Verified lab report generated from the executed notebook results."
 

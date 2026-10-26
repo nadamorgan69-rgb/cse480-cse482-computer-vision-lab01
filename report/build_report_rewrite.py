@@ -7,7 +7,7 @@ from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
-from reportlab.platypus import CondPageBreak, Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
+from reportlab.platypus import Image, PageBreak, Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -31,24 +31,24 @@ styles.add(ParagraphStyle(
     textColor=colors.HexColor("#1f2d38"), spaceAfter=5, alignment=TA_CENTER,
 ))
 styles.add(ParagraphStyle(
-    name="LabBody", fontName="Helvetica", fontSize=12, leading=15.5,
-    textColor=colors.HexColor("#1f2d38"), spaceAfter=8, alignment=TA_JUSTIFY,
+    name="LabBody", fontName="Helvetica", fontSize=12, leading=14.2,
+    textColor=colors.HexColor("#1f2d38"), spaceAfter=6, alignment=TA_JUSTIFY,
 ))
 styles.add(ParagraphStyle(
-    name="LabCaption", fontName="Helvetica-Oblique", fontSize=12, leading=14.5,
-    textColor=colors.HexColor("#465565"), spaceAfter=9, alignment=TA_CENTER,
+    name="LabCaption", fontName="Helvetica-Oblique", fontSize=12, leading=13.8,
+    textColor=colors.HexColor("#465565"), spaceAfter=6, alignment=TA_CENTER,
 ))
 styles["Heading1"].textColor = colors.black
 styles["Heading1"].fontSize = 18
 styles["Heading1"].leading = 22
-styles["Heading1"].spaceBefore = 4
-styles["Heading1"].spaceAfter = 7
+styles["Heading1"].spaceBefore = 2
+styles["Heading1"].spaceAfter = 5
 styles["Heading1"].alignment = TA_JUSTIFY
 styles["Heading2"].textColor = colors.black
 styles["Heading2"].fontSize = 16
 styles["Heading2"].leading = 20
-styles["Heading2"].spaceBefore = 5
-styles["Heading2"].spaceAfter = 4
+styles["Heading2"].spaceBefore = 3
+styles["Heading2"].spaceAfter = 3
 styles["Heading2"].alignment = TA_JUSTIFY
 
 story = []
@@ -63,7 +63,7 @@ def figure(relative_path, caption, width=440):
     with PILImage.open(path) as im:
         w, h = im.size
     story.append(Image(str(path), width=width, height=width * h / w))
-    p(caption, "LabCaption")
+    story.append(Paragraph(caption, styles["LabCaption"]))
 
 
 def table(rows, widths=None):
@@ -74,9 +74,9 @@ def table(rows, widths=None):
         ("FONTNAME", (0, 1), (-1, -1), "Helvetica"),
         ("TEXTCOLOR", (0, 0), (-1, -1), colors.HexColor("#1f2d38")),
         ("FONTSIZE", (0, 0), (-1, -1), 12),
-        ("LEADING", (0, 0), (-1, -1), 14.5),
-        ("BOTTOMPADDING", (0, 0), (-1, -1), 5),
-        ("TOPPADDING", (0, 0), (-1, -1), 5),
+        ("LEADING", (0, 0), (-1, -1), 13.5),
+        ("BOTTOMPADDING", (0, 0), (-1, -1), 4),
+        ("TOPPADDING", (0, 0), (-1, -1), 4),
         ("LINEBELOW", (0, 0), (-1, 0), 0.5, colors.HexColor("#aab9c7")),
         ("LINEBELOW", (0, 1), (-1, -1), 0.25, colors.HexColor("#dce3e9")),
         ("VALIGN", (0, 0), (-1, -1), "TOP"),
@@ -122,7 +122,7 @@ p(
 figure(
     "task1/stages.png",
     "Figure 1. From left to right: the supplied image, grayscale brightness, red-channel intensity, the binary decision, the selected original pixels, and the final colour/grayscale composition.",
-    width=438,
+    width=400,
 )
 p(
     f"The white regions of the mask are the pixels that passed all four tests; the black regions failed at least "
@@ -138,7 +138,7 @@ p(
 
 
 # Page 2 - weighted overlay
-story.append(CondPageBreak(220))
+story.append(PageBreak())
 p("2. Creating a Ghostly Overlay", "Heading1")
 p(
     "Weighted addition is performed at matching array positions, so both inputs first had to have the same height, "
@@ -163,7 +163,7 @@ table([
 figure(
     "task2/comparison.png",
     "Figure 2. The prepared inputs and the three pixel-by-pixel blends. The relative weights change both subject visibility and the overall background level.",
-    width=440,
+    width=360,
 )
 p(
     "In the 0.75/0.25 result, the cameraman, tripod, and horizon remain the main structure, while the zebra appears "
@@ -178,7 +178,7 @@ p(
 
 
 # Page 3 - vignette
-story.append(CondPageBreak(220))
+story.append(PageBreak())
 p("3. Artistic Vignette Filtering", "Heading1")
 p(
     "I wanted attention to remain on the rover and nearby terrain while the frame edges became darker. I began with "
@@ -198,7 +198,7 @@ p(
 figure(
     "task3/stages.png",
     "Figure 3. The hard circle defines the region of interest; Gaussian smoothing converts it into continuous weights, which darken the source progressively toward the frame edges.",
-    width=432,
+    width=365,
 )
 t3 = m["task3"]
 table([
@@ -219,7 +219,7 @@ p(
 
 
 # Page 4 - channel swapping on the zebra
-story.append(CondPageBreak(220))
+story.append(PageBreak())
 p("4. Channel Swapping - Zebra", "Heading1")
 p(
     "A colour image contains three intensity values at every pixel. OpenCV stores those planes as blue, green, "
@@ -231,7 +231,7 @@ p(
 figure(
     "task4/comparison.png",
     "Figure 4. The original zebra and three exact channel permutations. The coat accents, muzzle, tail, and shadow change most; the neutral background and stripes change very little.",
-    width=432,
+    width=400,
 )
 rows = [["Output BGR", "Mean absolute change", "Maximum", "Changed pixels"]]
 for row in m["task4"]["experiments"][:3]:
@@ -252,7 +252,7 @@ p(
 
 
 # Page 5 - stronger example, limitations, and conclusion
-story.append(CondPageBreak(220))
+story.append(PageBreak())
 p("Channel Swapping on the Mars Image", "Heading1")
 p(
     "I repeated the same three assignments on the Mars rover image as a supplementary comparison. I did not add a "
@@ -261,7 +261,7 @@ p(
 figure(
     "task4/supplementary_marsrover.png",
     "Figure 5. The Mars scene makes the same permutations easier to see because the orange-brown terrain has strongly unequal channel values.",
-    width=415,
+    width=385,
 )
 rows = [["Output BGR", "Zebra mean change", "Mars mean change"]]
 for zebra, mars in zip(m["task4"]["experiments"][:3], m["task4"]["experiments"][3:]):
@@ -275,7 +275,7 @@ p(
     "panels still remain relatively stable. Comparing Figures 4 and 5 shows that a permutation is not inherently "
     "dramatic; its appearance depends on how similar or different the source channels are at each pixel."
 )
-story.append(CondPageBreak(260))
+story.append(PageBreak())
 p("What I learned and what remains limited", "Heading2")
 p(
     "The four results connect directly to their pixel operations. Complementary masks can combine colour and "
@@ -295,21 +295,19 @@ p(
 
 def footer(canvas, doc):
     canvas.saveState()
-    canvas.setStrokeColor(colors.HexColor("#ccd6df"))
-    canvas.line(48, 40, A4[0] - 48, 40)
-    canvas.setFont("Helvetica", 8)
+    canvas.setFont("Helvetica", 9)
     canvas.setFillColor(colors.HexColor("#526576"))
-    canvas.drawString(48, 28, "CSE480/CSE482 | Computer Vision Lab | Assignment #01")
-    canvas.drawRightString(A4[0] - 48, 28, str(doc.page - 1))
+    canvas.drawCentredString(A4[0] / 2, 28, str(doc.page - 1))
     canvas.restoreState()
 
 
 output = ROOT / "report" / "Lab01_Report.pdf"
 doc = SimpleDocTemplate(
-    str(output), pagesize=A4, rightMargin=48, leftMargin=48, topMargin=40, bottomMargin=54,
+    str(output), pagesize=A4, rightMargin=48, leftMargin=48, topMargin=36, bottomMargin=45,
     title="Computer Vision Lab Assignment 01",
     author="Nada Said Yassin Morgan",
     pageCompression=1,
+    allowSplitting=0,
 )
 doc.build(story, onFirstPage=lambda canvas, document: None, onLaterPages=footer)
 print(output)

@@ -76,6 +76,14 @@ def mark_table_header(row):
     tr_pr.append(tbl_header)
 
 
+def prevent_row_split(row):
+    tr_pr = row._tr.get_or_add_trPr()
+    cant_split = tr_pr.find(qn("w:cantSplit"))
+    if cant_split is None:
+        cant_split = OxmlElement("w:cantSplit")
+        tr_pr.append(cant_split)
+
+
 def set_repeat_table_layout(table):
     tbl_pr = table._tbl.tblPr
     layout = tbl_pr.first_child_found_in("w:tblLayout")
@@ -92,6 +100,7 @@ def style_table(table, widths, numeric_columns=()):
     set_table_borders(table)
     mark_table_header(table.rows[0])
     for row_index, row in enumerate(table.rows):
+        prevent_row_split(row)
         for column_index, cell in enumerate(row.cells):
             cell.width = widths[column_index]
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
@@ -126,11 +135,13 @@ def add_figure(doc, relative_path, caption, width=Inches(7.0), alt_text=""):
     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
     paragraph.paragraph_format.space_before = Pt(3)
     paragraph.paragraph_format.space_after = Pt(2)
+    paragraph.paragraph_format.keep_together = True
+    paragraph.paragraph_format.keep_with_next = True
     shape = paragraph.add_run().add_picture(str(RESULTS / relative_path), width=width)
     set_alt_text(shape, caption, alt_text or caption)
     caption_paragraph = doc.add_paragraph(caption, style="Caption")
     caption_paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    caption_paragraph.paragraph_format.keep_with_next = True
+    caption_paragraph.paragraph_format.keep_together = True
 
 
 def add_labeled_paragraph(doc, label, text):
@@ -168,6 +179,8 @@ def add_native_equation(doc, equation_text):
     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
     paragraph.paragraph_format.space_before = Pt(2)
     paragraph.paragraph_format.space_after = Pt(6)
+    paragraph.paragraph_format.keep_together = True
+    paragraph.paragraph_format.keep_with_next = True
     math_para = OxmlElement("m:oMathPara")
     math_obj = OxmlElement("m:oMath")
     math_run = OxmlElement("m:r")
@@ -190,8 +203,11 @@ def add_task_heading(doc, text):
 
 
 def add_page_number(paragraph):
+    paragraph.text = ""
     paragraph.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    paragraph.add_run("CSE480 CSE482   Computer Vision Lab   Assignment 01   Page ")
+    paragraph.paragraph_format.space_before = Pt(0)
+    paragraph.paragraph_format.space_after = Pt(0)
+    remove_paragraph_borders(paragraph._p.get_or_add_pPr())
     run = paragraph.add_run()
     fld_char_begin = OxmlElement("w:fldChar")
     fld_char_begin.set(qn("w:fldCharType"), "begin")
@@ -205,8 +221,22 @@ def add_page_number(paragraph):
     run._r.append(fld_char_end)
     for r in paragraph.runs:
         r.font.name = "Arial"
-        r.font.size = Pt(8)
+        r.font.size = Pt(9)
         r.font.color.rgb = RGBColor(89, 89, 89)
+
+
+def keep_all_paragraphs_unsplit(document):
+    """Prevent Word from dividing any report paragraph between two pages."""
+    for paragraph in document.paragraphs:
+        paragraph.paragraph_format.keep_together = True
+        paragraph.paragraph_format.widow_control = True
+    for table in document.tables:
+        for row in table.rows:
+            prevent_row_split(row)
+            for cell in row.cells:
+                for paragraph in cell.paragraphs:
+                    paragraph.paragraph_format.keep_together = True
+                    paragraph.paragraph_format.widow_control = True
 
 
 def remove_paragraph_borders(property_container):
@@ -249,6 +279,8 @@ normal.font.color.rgb = BLACK
 normal.paragraph_format.space_after = Pt(5)
 normal.paragraph_format.line_spacing = 1.12
 normal.paragraph_format.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
+normal.paragraph_format.keep_together = True
+normal.paragraph_format.widow_control = True
 
 title_style = styles["Title"]
 title_style.font.name = "Arial"
@@ -544,6 +576,7 @@ doc.core_properties.author = "Nada Said Yassin Morgan"
 doc.core_properties.keywords = "OpenCV, computer vision, selective colour, blending, vignette, channel swapping"
 doc.core_properties.comments = "Verified lab report generated from the executed notebook results."
 
+keep_all_paragraphs_unsplit(doc)
 OUTPUT.parent.mkdir(parents=True, exist_ok=True)
 doc.save(OUTPUT)
 print(OUTPUT)

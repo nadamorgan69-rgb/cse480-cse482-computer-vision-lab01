@@ -1,0 +1,332 @@
+{
+  "checks": {
+    "task1": "PASS",
+    "task2": "PASS",
+    "task3": "PASS",
+    "task4": "PASS"
+  },
+  "inputs": {
+    "apple.png": {
+      "shape_HWC": [
+        300,
+        300,
+        3
+      ],
+      "dtype": "uint8",
+      "range": [
+        0,
+        249
+      ],
+      "sha256": "eeac141e89a386d7a9786849151108ea4d175ee36eb02e16a9c55b95fd6ff444"
+    },
+    "blackCat.png": {
+      "shape_HWC": [
+        500,
+        500,
+        3
+      ],
+      "dtype": "uint8",
+      "range": [
+        4,
+        255
+      ],
+      "sha256": "4fbe4ce24d53173e1996a723dea9d1be2dc32328c30b87d426f196421b7903f6"
+    },
+    "whiteCat.png": {
+      "shape_HWC": [
+        500,
+        500,
+        3
+      ],
+      "dtype": "uint8",
+      "range": [
+        0,
+        255
+      ],
+      "sha256": "2bab40079d155fe559ac40fb0ac37539f67ecea810e34f66494f7bae442ff4cf"
+    },
+    "cameraman.jpg": {
+      "shape_HWC": [
+        225,
+        225,
+        3
+      ],
+      "dtype": "uint8",
+      "range": [
+        0,
+        255
+      ],
+      "sha256": "8058d5d1148b24c12a81a1e02ce63b34d2d500ba9eafe3c9a934ffb09d827583"
+    },
+    "marsrover.png": {
+      "shape_HWC": [
+        480,
+        853,
+        3
+      ],
+      "dtype": "uint8",
+      "range": [
+        0,
+        255
+      ],
+      "sha256": "6b2ab7f91f8dd5324a6482330de7ece4468fa4dd592e18f86b584f56d53eda22"
+    },
+    "zebra.png": {
+      "shape_HWC": [
+        313,
+        425,
+        3
+      ],
+      "dtype": "uint8",
+      "range": [
+        0,
+        255
+      ],
+      "sha256": "910e0f233bf97748e5b24a5b2b4ab03597439ea11a759ccde68a5ca93b39f4f1"
+    }
+  },
+  "metrics": {
+    "task1": {
+      "selected_percent": 54.51555555555555,
+      "thresholds": [
+        70,
+        30,
+        25,
+        35
+      ]
+    },
+    "task2": {
+      "resized_zebra_WH": [
+        225,
+        166
+      ],
+      "padding_TBLR": [
+        29,
+        30,
+        0,
+        0
+      ],
+      "experiments": [
+        {
+          "alpha": 0.75,
+          "beta": 0.25,
+          "max_rounding_error": 0
+        },
+        {
+          "alpha": 0.5,
+          "beta": 0.5,
+          "max_rounding_error": 0
+        },
+        {
+          "alpha": 0.25,
+          "beta": 0.75,
+          "max_rounding_error": 0
+        }
+      ]
+    },
+    "task3": {
+      "radius": 226,
+      "sigma": 91.2,
+      "kernel_size": 549,
+      "center_before_mean": 106.88298286604362,
+      "center_after_mean": 101.00338785046729,
+      "corner_before_mean": 138.67205882352943,
+      "corner_after_mean": 0.9096813725490196,
+      "max_adjacent_weight_step": 0.004358887672424316,
+      "center_weight": 1.0
+    },
+    "task4": {
+      "experiments": [
+        {
+          "source": "zebra",
+          "BGR_tuple": "(R,G,B)",
+          "MAE": 2.35550711019232,
+          "max_difference": 64,
+          "changed_pixel_percent": 51.100169141138885
+        },
+        {
+          "source": "zebra",
+          "BGR_tuple": "(B,R,G)",
+          "MAE": 1.407920816889056,
+          "max_difference": 34,
+          "changed_pixel_percent": 45.16744972749483
+        },
+        {
+          "source": "zebra",
+          "BGR_tuple": "(G,B,R)",
+          "MAE": 1.7144095721355634,
+          "max_difference": 35,
+          "changed_pixel_percent": 50.14621311783499
+        },
+        {
+          "source": "marsrover",
+          "BGR_tuple": "(R,G,B)",
+          "MAE": 29.796453692848768,
+          "max_difference": 156,
+          "changed_pixel_percent": 99.38940992575225
+        },
+        {
+          "source": "marsrover",
+          "BGR_tuple": "(B,R,G)",
+          "MAE": 18.263908427771266,
+          "max_difference": 126,
+          "changed_pixel_percent": 98.11303243454475
+        },
+        {
+          "source": "marsrover",
+          "BGR_tuple": "(G,B,R)",
+          "MAE": 11.737019669141592,
+          "max_difference": 95,
+          "changed_pixel_percent": 97.84779210629152
+        }
+      ],
+      "neutral_zebra_percent": 46.47246758128171
+    }
+  },
+  "saved_arrays": {
+    "results\\task1\\original.png": [
+      300,
+      300,
+      3
+    ],
+    "results\\task1\\grayscale.png": [
+      300,
+      300
+    ],
+    "results\\task1\\red_channel.png": [
+      300,
+      300
+    ],
+    "results\\task1\\red_mask.png": [
+      300,
+      300
+    ],
+    "results\\task1\\colored_region.png": [
+      300,
+      300,
+      3
+    ],
+    "results\\task1\\grayscale_background.png": [
+      300,
+      300,
+      3
+    ],
+    "results\\task1\\selective_color.png": [
+      300,
+      300,
+      3
+    ],
+    "results\\task2\\original_cameraman.png": [
+      225,
+      225,
+      3
+    ],
+    "results\\task2\\original_zebra.png": [
+      313,
+      425,
+      3
+    ],
+    "results\\task2\\resized_cameraman.png": [
+      225,
+      225,
+      3
+    ],
+    "results\\task2\\resized_zebra.png": [
+      225,
+      225,
+      3
+    ],
+    "results\\task2\\blend_first_dominant.png": [
+      225,
+      225,
+      3
+    ],
+    "results\\task2\\blend_equal.png": [
+      225,
+      225,
+      3
+    ],
+    "results\\task2\\blend_second_dominant.png": [
+      225,
+      225,
+      3
+    ],
+    "results\\task3\\original.png": [
+      480,
+      853,
+      3
+    ],
+    "results\\task3\\circular_mask.png": [
+      480,
+      853
+    ],
+    "results\\task3\\blurred_mask.png": [
+      480,
+      853
+    ],
+    "results\\task3\\vignette.png": [
+      480,
+      853,
+      3
+    ],
+    "results\\task4\\original.png": [
+      313,
+      425,
+      3
+    ],
+    "results\\task4\\blue_channel.png": [
+      313,
+      425
+    ],
+    "results\\task4\\green_channel.png": [
+      313,
+      425
+    ],
+    "results\\task4\\red_channel.png": [
+      313,
+      425
+    ],
+    "results\\task4\\reconstructed_bgr.png": [
+      313,
+      425,
+      3
+    ],
+    "results\\task4\\zebra_swap1_RGB.png": [
+      313,
+      425,
+      3
+    ],
+    "results\\task4\\zebra_swap2_BRG.png": [
+      313,
+      425,
+      3
+    ],
+    "results\\task4\\zebra_swap3_GBR.png": [
+      313,
+      425,
+      3
+    ],
+    "results\\task4\\marsrover_swap1_RGB.png": [
+      480,
+      853,
+      3
+    ],
+    "results\\task4\\marsrover_swap2_BRG.png": [
+      480,
+      853,
+      3
+    ],
+    "results\\task4\\marsrover_swap3_GBR.png": [
+      480,
+      853,
+      3
+    ]
+  },
+  "png_count": 38,
+  "versions": {
+    "python": "3.12.14",
+    "opencv": "5.0.0",
+    "numpy": "2.3.5",
+    "matplotlib": "3.11.2"
+  }
+}
